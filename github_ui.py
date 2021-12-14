@@ -15,6 +15,11 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1080, 623)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setLayoutDirection(QtCore.Qt.LeftToRight)
         MainWindow.setStyleSheet("QWidget { background-color: rgb(13, 17, 23); } \n"
 "QFrame { border: 2px solid rgb(0, 191, 255) } \n"
@@ -105,17 +110,21 @@ class Ui_MainWindow(object):
         self.branchesComboBox.addItem("")
         self.branchesComboBox.addItem("")
         self.branchesComboBox_2 = QtWidgets.QComboBox(self.centralwidget)
-        self.branchesComboBox_2.setGeometry(QtCore.QRect(460, 20, 611, 51))
+        self.branchesComboBox_2.setGeometry(QtCore.QRect(460, 20, 401, 51))
         self.branchesComboBox_2.setFrame(True)
         self.branchesComboBox_2.setObjectName("branchesComboBox_2")
         self.branchesComboBox_2.addItem("")
         self.branchesComboBox_2.addItem("")
         self.branchesComboBox_2.addItem("")
         self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEdit.setGeometry(QtCore.QRect(260, 80, 511, 31))
+        self.textEdit.setGeometry(QtCore.QRect(260, 80, 371, 31))
+        self.textEdit.setStyleSheet("QTextEdit { border: none }")
+        self.textEdit.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.textEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName("textEdit")
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(260, 120, 811, 451))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(260, 220, 811, 351))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -129,6 +138,41 @@ class Ui_MainWindow(object):
         self.textEdit_3 = QtWidgets.QTextEdit(self.horizontalLayoutWidget)
         self.textEdit_3.setObjectName("textEdit_3")
         self.horizontalLayout.addWidget(self.textEdit_3)
+        self.textEdit_5 = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_5.setGeometry(QtCore.QRect(260, 100, 371, 31))
+        self.textEdit_5.setStyleSheet("QTextEdit { border: none }")
+        self.textEdit_5.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.textEdit_5.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit_5.setReadOnly(True)
+        self.textEdit_5.setObjectName("textEdit_5")
+        self.textEdit_6 = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_6.setGeometry(QtCore.QRect(870, 10, 171, 31))
+        self.textEdit_6.setStyleSheet("QTextEdit { border: none }")
+        self.textEdit_6.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.textEdit_6.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit_6.setReadOnly(True)
+        self.textEdit_6.setObjectName("textEdit_6")
+        self.textEdit_7 = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_7.setGeometry(QtCore.QRect(870, 40, 211, 31))
+        self.textEdit_7.setStyleSheet("QTextEdit { border: none }")
+        self.textEdit_7.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.textEdit_7.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit_7.setReadOnly(True)
+        self.textEdit_7.setObjectName("textEdit_7")
+        self.textEdit_8 = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_8.setGeometry(QtCore.QRect(640, 80, 431, 51))
+        self.textEdit_8.setStyleSheet("")
+        self.textEdit_8.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.textEdit_8.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit_8.setReadOnly(True)
+        self.textEdit_8.setObjectName("textEdit_8")
+        self.textEdit_9 = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_9.setGeometry(QtCore.QRect(260, 140, 811, 71))
+        self.textEdit_9.setStyleSheet("")
+        self.textEdit_9.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.textEdit_9.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit_9.setReadOnly(True)
+        self.textEdit_9.setObjectName("textEdit_9")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1080, 26))
@@ -158,11 +202,38 @@ class Ui_MainWindow(object):
         self.branchesComboBox.setItemText(0, _translate("MainWindow", "master"))
         self.branchesComboBox.setItemText(1, _translate("MainWindow", "bebra1"))
         self.branchesComboBox.setItemText(2, _translate("MainWindow", "bebra2"))
-        self.branchesComboBox_2.setItemText(0, _translate("MainWindow", "\"summary_bebra\" by user1 on 0001-01-1: c2d29867-3d0b-d497-cccc-18a9d8ee7830"))
-        self.branchesComboBox_2.setItemText(1, _translate("MainWindow", "\"summary_xui\" by user2 on 0002-01-1: 00000000-0000-0000-cccc-18a9d8ee7830"))
-        self.branchesComboBox_2.setItemText(2, _translate("MainWindow", "\"summary_deeec\" by user3 on 0003-01-1: 00000000-0000-0001-cccc-18a9d8ee7830"))
+        self.branchesComboBox_2.setItemText(0, _translate("MainWindow", "\"summary_bebra\" by user1 on 0001-01-1 "))
+        self.branchesComboBox_2.setItemText(1, _translate("MainWindow", "\"summary_xui\" by user2 on 0002-01-1"))
+        self.branchesComboBox_2.setItemText(2, _translate("MainWindow", "\"summary_deeec\" by user3 on 0003-01-1"))
         self.textEdit.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">current branch uuid: c2d29867-3d0b-d497-bbbb-18a9d8ee7830</span></p></body></html>"))
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:7pt; color:#ffffff;\">current branch uuid: c2d29867-3d0b-d497-bbbb-18a9d8ee7830</span></p></body></html>"))
+        self.textEdit_5.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:7pt; color:#ffffff;\">current commit uuid: c2d29867-3d0b-d497-cccc-18a9d8ee7830</span></p></body></html>"))
+        self.textEdit_6.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">last commit by </span><span style=\" font-family:\'Arial\'; font-size:10pt; text-decoration: underline; color:#ffffff;\">pavviaz</span></p></body></html>"))
+        self.textEdit_7.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">commited on 0001-01-1</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Arial\'; font-size:10pt; color:#ffffff;\"><br /></p></body></html>"))
+        self.textEdit_8.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">Summary: Init commit. Added some shit</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Arial\'; font-size:10pt; color:#ffffff;\"><br /></p></body></html>"))
+        self.textEdit_9.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">Description: I dont know what I should write here. Okay, I added a bunch of new fucking code. Thats All?</span></p></body></html>"))
