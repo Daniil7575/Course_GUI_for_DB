@@ -115,3 +115,4 @@ window = GithubApp()
 
 window.show()
 git.exec_()
+
