@@ -107,6 +107,13 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
 
         return oct + "-" + quads + "-" + twlv
     
+    def __odin_protection(self, query):
+        black_list = ("--", ";", "\\", "/", "||")
+
+        if any(el in query for el in black_list):
+            return ""
+        return query
+
     def __paint_reps(self):  # TODO: move this function to the end of setupUi()
         for rep in range(self.repositoryList.count()):
             self.repositoryList.item(rep).setForeground(QtGui.QBrush(QtGui.QColor(255, 255, 255)))

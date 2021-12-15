@@ -118,5 +118,5 @@ class GithubApp(QMainWindow, github_ui.Ui_MainWindow):
 # git.exec()
 # print(f"{nd.generate(alphabet='abcdef1234567890', size=8)}-{nd.generate(alphabet='abcdef1234567890', size=4)}")
 
-a = "abc"
-print(a.replace("i", "k"))
+a = input()
+print(a)
