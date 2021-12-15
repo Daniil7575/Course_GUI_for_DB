@@ -39,8 +39,12 @@ class Ui_MainWindow(object):
 "    border: 2px solid rgb(35, 134, 54);\n"
 "    background-color: rgb(35, 134, 54);\n"
 "    color: white;\n"
-"    font: bold 16px\n"
-"}")
+"    font: bold 14px\n"
+"}\n"
+"QTextEdit {\n"
+"    color: white;\n"
+"    font-size: 18px\n"
+"}\n")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.repositoryList = QtWidgets.QListWidget(self.centralwidget)

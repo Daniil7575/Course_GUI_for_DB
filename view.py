@@ -1,4 +1,3 @@
-from typing import get_origin
 import github_ui3
 import login_dialog
 import sys
@@ -153,21 +152,36 @@ class GithubApp(QMainWindow, github_ui3.Ui_MainWindow):
         # print(self.reps)
         # print(self.reps[self.current_rep])
         self.cur.execute(f"select id, name from branch where rep_id = '{self.reps[self.current_rep]}'")
+        self.branchesComboBox.currentTextChanged.connect(self.change_commit_view)
         for record in self.cur.fetchall():
             self.branches_name_id[record[1]] = record[0]
             print(self.branches_name_id)
             self.branchesComboBox.addItem(record[1])
-        self.branchesComboBox.currentTextChanged.connect(self.change_commit_view)
-             
+    
     def change_commit_view(self, curr_obj):
+        try:
+            self.commitsComboBox.currentTextChanged.disconnect(self.change_summary_description)
+        except:
+            ...
         self.commitsComboBox.clear()
         self.current_branch = curr_obj
         # print(self.current_rep)
         # print(self.reps)
         # print(self.reps[self.current_rep])
         self.cur.execute(f"select branch_id, usr_login, uuid from commits where branch_id = '{self.branches_name_id[self.current_branch]}'")
+        self.commitsComboBox.currentTextChanged.connect(self.change_summary_description)   
         for record in self.cur.fetchall():
             self.commitsComboBox.addItem(record[2])
+        
+    def change_summary_description(self, curr_obj):
+        self.current_commit = curr_obj
+        print(self.current_commit)
+        self.cur.execute(f"select summary, description from commits where uuid = '{self.current_commit}'")
+        for record in self.cur.fetchall():
+            self.summary.setText(f"Summary: {record[0]}")
+            self.description.setText(f"Description: {record[1]}")
+
+
 
     # def set_branches(self):
 
