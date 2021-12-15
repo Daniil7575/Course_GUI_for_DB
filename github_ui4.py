@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\spovt\Documents\GitHub\Course_GUI_for_DB\github3.ui'
+# Form implementation generated from reading ui file 'C:\Users\spovt\Documents\GitHub\Course_GUI_for_DB\github_ui4.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -68,90 +68,27 @@ class Ui_MainWindow(object):
         self.repositoryList.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.repositoryList.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
         self.repositoryList.setObjectName("repositoryList")
-        item = QtWidgets.QListWidgetItem()
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setUnderline(True)
-        font.setWeight(75)
-        font.setKerning(True)
-        item.setFont(font)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.NoBrush)
-        item.setBackground(brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.NoBrush)
-        item.setForeground(brush)
-        # self.repositoryList.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        item.setTextAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignVCenter)
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        item.setFont(font)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.NoBrush)
-        item.setForeground(brush)
-        # self.repositoryList.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setItalic(True)
-        font.setWeight(75)
-        item.setFont(font)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.NoBrush)
-        item.setBackground(brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.NoBrush)
-        item.setForeground(brush)
-        # self.repositoryList.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        item.setFont(font)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.NoBrush)
-        item.setBackground(brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.NoBrush)
-        item.setForeground(brush)
-        # self.repositoryList.addItem(item)
         self.branchesComboBox = QtWidgets.QComboBox(self.centralwidget)
         self.branchesComboBox.setGeometry(QtCore.QRect(360, 20, 401, 51))
         self.branchesComboBox.setFrame(True)
         self.branchesComboBox.setObjectName("branchesComboBox")
-        # self.branchesComboBox.addItem("")
-        # self.branchesComboBox.addItem("")
-        # self.branchesComboBox.addItem("")
         self.commitsComboBox = QtWidgets.QComboBox(self.centralwidget)
         self.commitsComboBox.setGeometry(QtCore.QRect(770, 20, 851, 51))
         self.commitsComboBox.setFrame(True)
         self.commitsComboBox.setObjectName("commitsComboBox")
-        # self.commitsComboBox.addItem("")
-        # self.commitsComboBox.addItem("")
-        # self.commitsComboBox.addItem("")
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(360, 270, 1541, 731))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.codeText = QtWidgets.QTextEdit(self.horizontalLayoutWidget)
-        self.codeText.setStyleSheet("")
-        self.codeText.setObjectName("codeText")
-        self.horizontalLayout.addWidget(self.codeText)
         self.modelText = QtWidgets.QTextEdit(self.horizontalLayoutWidget)
+        self.modelText.setStyleSheet("")
         self.modelText.setObjectName("modelText")
         self.horizontalLayout.addWidget(self.modelText)
+        self.codeText = QtWidgets.QTextEdit(self.horizontalLayoutWidget)
+        self.codeText.setObjectName("codeText")
+        self.horizontalLayout.addWidget(self.codeText)
         self.datasetText = QtWidgets.QTextEdit(self.horizontalLayoutWidget)
         self.datasetText.setObjectName("datasetText")
         self.horizontalLayout.addWidget(self.datasetText)
@@ -175,11 +112,7 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.lastCommitOwner = QtWidgets.QTextEdit(self.verticalLayoutWidget)
-        self.lastCommitOwner.setStyleSheet("QTextEdit { border: none }")
-        self.lastCommitOwner.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.lastCommitOwner.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.lastCommitOwner.setReadOnly(True)
+        self.lastCommitOwner = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.lastCommitOwner.setObjectName("lastCommitOwner")
         self.verticalLayout.addWidget(self.lastCommitOwner)
         self.lastCommitDate = QtWidgets.QTextEdit(self.verticalLayoutWidget)
@@ -215,14 +148,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem)
-
-        self.pushButton = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_2.addWidget(self.pushButton)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem1)
+        self.newRepButton = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.newRepButton.setObjectName("newRepButton")
+        self.horizontalLayout_2.addWidget(self.newRepButton)
+        self.newBranchButton = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.newBranchButton.setObjectName("newBranchButton")
+        self.horizontalLayout_2.addWidget(self.newBranchButton)
+        self.commitButton = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.commitButton.setObjectName("commitButton")
+        self.horizontalLayout_2.addWidget(self.commitButton)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1910, 26))
@@ -238,23 +172,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-#         __sortingEnabled = self.repositoryList.isSortingEnabled()
-#         self.repositoryList.setSortingEnabled(False)
-#         item = self.repositoryList.item(0)
-#         item.setText(_translate("MainWindow", "im2latex"))
-#         item = self.repositoryList.item(1)
-#         item.setText(_translate("MainWindow", "a very very very very long deeec"))
-#         item = self.repositoryList.item(2)
-#         item.setText(_translate("MainWindow", "latexOCRserver"))
-#         item = self.repositoryList.item(3)
-#         item.setText(_translate("MainWindow", "TensorSnake"))
-#         self.repositoryList.setSortingEnabled(__sortingEnabled)
-#         self.branchesComboBox.setItemText(0, _translate("MainWindow", "master"))
-#         self.branchesComboBox.setItemText(1, _translate("MainWindow", "bebra1"))
-#         self.branchesComboBox.setItemText(2, _translate("MainWindow", "bebra2"))
-#         self.commitsComboBox.setItemText(0, _translate("MainWindow", "\"summary_bebra\" by user1 on 0001-01-1 "))
-#         self.commitsComboBox.setItemText(1, _translate("MainWindow", "\"summary_xui\" by user2 on 0002-01-1"))
-#         self.commitsComboBox.setItemText(2, _translate("MainWindow", "\"summary_deeec\" by user3 on 0003-01-1"))
 #         self.modelText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 # "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 # "p, li { white-space: pre-wrap; }\n"
@@ -265,32 +182,28 @@ class Ui_MainWindow(object):
 # "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 # "p, li { white-space: pre-wrap; }\n"
 # "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-# "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">Summary: Init commit. Added some shit</span></p>\n"
-# "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Arial\'; font-size:10pt; color:#ffffff;\"><br /></p></body></html>"))
+# "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
 #         self.description.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 # "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 # "p, li { white-space: pre-wrap; }\n"
 # "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-# "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">Description: I dont know what I should write here. Okay, I added a bunch of new fucking code. Thats All?</span></p></body></html>"))
-#         self.lastCommitOwner.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-# "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-# "p, li { white-space: pre-wrap; }\n"
-# "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-# "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">last commit by </span><span style=\" font-family:\'Arial\'; font-size:10pt; text-decoration: underline; color:#ffffff;\">pavviaz</span></p></body></html>"))
+# "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+#         self.lastCommitOwner.setText(_translate("MainWindow", "PushButton"))
 #         self.lastCommitDate.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 # "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 # "p, li { white-space: pre-wrap; }\n"
 # "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-# "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#ffffff;\">commited on 0001-01-1</span></p>\n"
-# "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Arial\'; font-size:10pt; color:#ffffff;\"><br /></p></body></html>"))
+# "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
 #         self.currentCommit.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 # "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 # "p, li { white-space: pre-wrap; }\n"
 # "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-# "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:7pt; color:#ffffff;\">current commit uuid: c2d29867-3d0b-d497-cccc-18a9d8ee7830</span></p></body></html>"))
+# "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
 #         self.currentBranch.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 # "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 # "p, li { white-space: pre-wrap; }\n"
 # "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-# "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:7pt; color:#ffffff;\">current branch uuid: c2d29867-3d0b-d497-bbbb-18a9d8ee7830</span></p></body></html>"))
-        self.pushButton.setText(_translate("MainWindow", "Commit"))
+# "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+        self.newRepButton.setText(_translate("MainWindow", "PushButton"))
+        self.newBranchButton.setText(_translate("MainWindow", "PushButton"))
+        self.commitButton.setText(_translate("MainWindow", "PushButton"))

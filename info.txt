@@ -1,1 +1,1 @@
-pyuic5 pyuic5 C:\Users\spovt\Documents\GitHub\Course_GUI_for_DB\github3.ui -o C:\Users\spovt\Documents\GitHub\Course_GUI_for_DB\github3.py
+.\pyuic5 C:\Users\spovt\Documents\GitHub\Course_GUI_for_DB\github3.ui -o C:\Users\spovt\Documents\GitHub\Course_GUI_for_DB\github3.py

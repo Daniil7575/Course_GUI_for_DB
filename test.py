@@ -1,5 +1,6 @@
 from typing import get_origin
 import github_ui
+import nanoid as nd
 import login_dialog
 import sys
 import json
@@ -110,9 +111,12 @@ class GithubApp(QMainWindow, github_ui.Ui_MainWindow):
                 self.repositoryList.addItem(item)
         self.__paint_reps()
 
-git = QtWidgets.QApplication(sys.argv)
-window = GithubApp()
+# git = QtWidgets.QApplication(sys.argv)
+# window = GithubApp()
 
-window.show()
-git.exec_()
+# window.show()
+# git.exec()
+# print(f"{nd.generate(alphabet='abcdef1234567890', size=8)}-{nd.generate(alphabet='abcdef1234567890', size=4)}")
 
+a = "abc"
+print(a.replace("i", "k"))
