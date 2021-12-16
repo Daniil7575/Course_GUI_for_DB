@@ -46,6 +46,9 @@ def pars2(string):
 
 def depars2(bytes):
     bytes = bytes + " "
+    if bytes == " ":
+        return
+
     res = ""
     buffer = ""
     for el in bytes:
@@ -263,6 +266,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.newRepButton.clicked.connect(self.create_rep)
         self.newBranchButton.clicked.connect(self.create_branch)
         self.commitButton.clicked.connect(self.commit)
+        self.deleteRepButton.clicked.connect(self.delete_rep)
         # self.branchesComboBox.currentTextChanged.connect(self.change_commit_view)
     
     def gen_uuid(self, alp="abcdef1234567890", type='rep'):
@@ -423,6 +427,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.change_code_model_dataset(self.current_branch)
     
     def change_sum_desc_tmps(self, curr_obj):
+        self.current_code_model_dataset = ["", "", ""]
         self.current_commit = curr_obj
 
         #---------------------------------------------------------------------------code model dataset----------------------------------------------------------------------
@@ -610,7 +615,8 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                     if self.current_code_model_dataset[indx] != snip:
                         inputs.insert(len(inputs) + indx + 1, '{"' + c_m_ds[indx] + '": "' + " ".join(snip) + '"}')
                         continue
-                    inputs.insert(len(inputs) + indx + 1, None)
+                else:
+                    inputs.insert(len(inputs) + indx + 1, None)    
 
             try:
                 if not commit_dialog.is_cancel:
@@ -632,9 +638,19 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         
         self.change_commit_view(self.current_branch)
 
-    # def delete_rep(self):
-    #     self.cur.execute()
-    # def get_commit_data(self):
+    def delete_rep(self):
+        try:
+            self.cur.execute(f"delete from repository where id = '{self.reps[self.current_rep]}'")
+        except:
+             QMessageBox.critical(  
+                        None,
+                        "DELETE ERROR",
+                        "Something goes wrong!")
+        finally:
+            self.conn.commit()
+            self.set_repositories()
+
+   
 
 
 git = QtWidgets.QApplication(sys.argv)
