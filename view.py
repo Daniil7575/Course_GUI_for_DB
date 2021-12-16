@@ -2,8 +2,11 @@ import github_ui8
 import login_dialog
 import user_creation_dialog
 import create_rep_dialog
+import create_branch_dialog
 import user_info_dialog
+import commit_dialog
 
+from os import error
 import sys
 import json
 import re
@@ -23,16 +26,37 @@ from PyQt5.QtWidgets import (
     QFormLayout,
 )
 
+
 # DB_PARAMS_PATH = "db_connection.json"
 POSTGRES_LOGIN = "postgres"
-POSTGRES_PASS = "16912"
+POSTGRES_PASS = "246509"
 
-def odin_protection(query):
+
+def odin_protection(query: str):
         black_list = ("--", ";", "\\", "/", "||", "chr(")
 
-        if any(el in query for el in black_list):
+        if any(el in query.replace("\\n", "").replace("\n", "") for el in black_list):
             return ""
         return query
+
+
+def pars2(string):
+    return [f"{hex(ord(el))}" for el in string]
+
+
+def depars2(bytes):
+    bytes = bytes + " "
+    res = ""
+    buffer = ""
+    for el in bytes:
+        if el != " ":
+            buffer += el
+            continue
+
+        res += chr(int(buffer, base=16))
+
+        buffer = ""
+    return res
 
 
 class UserInfoDialog(QDialog, user_info_dialog.Ui_Dialog):
@@ -164,13 +188,55 @@ class CreateRepDialog(QDialog, create_rep_dialog.Ui_Dialog):
         self.reject()
 
 
+class CreateBranchDialog(QDialog, create_branch_dialog.Ui_Dialog):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.setFixedSize(self.size())
+
+        self.isdone = False
+        self.is_cancel = False
+
+        self.createRepButton.clicked.connect(self.getIputs)
+        self.cancelButton.clicked.connect(self.exit)
+
+    def getIputs(self):
+        self.accept()
+        return (self.description.text())
+    
+    def exit(self):
+        self.is_cancel = True
+        self.reject()
+
+
+class CommitDialog(QDialog, commit_dialog.Ui_Dialog):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.setFixedSize(self.size())
+
+        self.isdone = False
+        self.is_cancel = False
+
+        self.commitButton.clicked.connect(self.getInputs)
+        self.cancelButton.clicked.connect(self.exit)
+
+    def getInputs(self):
+        self.accept()
+        return (self.codeCheckBox.isChecked(), self.modelCheckBox.isChecked(), self.datasetCheckBox.isChecked(), self.summary.text(), self.description.text())
+        
+    def exit(self):
+        self.is_cancel = True
+        self.reject()
+    
+
 class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
     current_rep = None
     reps = {}
     TYPES = {
         "rep": "0000",
-        "branch": "bbbb",
-        "comm": "ccc"
+        "br": "bbbb",
+        "c": "cccc"
         }
 
     # def _dialog_decorator(dialog_object):
@@ -195,6 +261,8 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.set_repositories()
         self.menuprofile.aboutToShow.connect(self.show_profile)
         self.newRepButton.clicked.connect(self.create_rep)
+        self.newBranchButton.clicked.connect(self.create_branch)
+        self.commitButton.clicked.connect(self.commit)
         # self.branchesComboBox.currentTextChanged.connect(self.change_commit_view)
     
     def gen_uuid(self, alp="abcdef1234567890", type='rep'):
@@ -306,7 +374,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
 
         self.branches_name_id = {}
         self.branchesComboBox.clear()
-        self.current_rep = curr_obj.text()
+        self.current_rep = curr_obj if isinstance(curr_obj, str) else curr_obj.text()
         # print(self.reps[self.current_rep])
         
         # print(self.current_rep)
@@ -325,49 +393,93 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             self.branches_name_id[record[1]] = record[0]
             # print(self.branches_name_id)
             self.branchesComboBox.addItem(record[1])
+        
+        # self.change_commit_view()
 
         # self.branchesComboBox.currentTextChanged.disconnect(self)
     
     def change_commit_view(self, curr_obj):
         try:
-            self.commitsComboBox.currentTextChanged.disconnect(self.change_summary_description)
+            self.commitsComboBox.currentTextChanged.disconnect(self.change_sum_desc_tmps)
         except:
             ...
-        self.commitsComboBox.clear()
-        self.current_branch = curr_obj
-        self.change_code_model_dataset(curr_obj)
-
-        self.cur.execute(f"select branch_id, usr_login, uuid from commits where branch_id = '{self.branches_name_id[self.current_branch]}'")
         
+        # try:
+        #     self.commitsComboBox.currentTextChanged.disconnect(lambda: self.change_code_model_dataset(curr_obj))
+        # except:
+        #     ...
+        self.current_branch = curr_obj
+        self.commitsComboBox.clear()
+
         self.currentCommit.clear()
         self.currentCommit.insertPlainText(f"current branch uuid: {self.branches_name_id[self.current_branch]}")
-        self.commitsComboBox.currentTextChanged.connect(self.change_summary_description) 
-        
+        self.commitsComboBox.currentTextChanged.connect(self.change_sum_desc_tmps) 
+    
+        # self.commitsComboBox.currentTextChanged.connect(lambda: self.change_code_model_dataset(curr_obj)) 
+        self.cur.execute(f"select branch_id, usr_login, uuid from commits where branch_id = '{self.branches_name_id[self.current_branch]}'")
         for record in self.cur.fetchall():
             self.commitsComboBox.addItem(record[2])
         
-    def change_summary_description(self, curr_obj):
+        self.change_code_model_dataset(self.current_branch)
+    
+    def change_sum_desc_tmps(self, curr_obj):
         self.current_commit = curr_obj
+
+        #---------------------------------------------------------------------------code model dataset----------------------------------------------------------------------
+        self.codeText.clear()
+        self.cur.execute(f"select tmp_model from commits where uuid = '{curr_obj}'")
+        for record in self.cur.fetchall():
+            if not record[0] == None:
+                for key, code in dict(record[0]).items():
+                    code = depars2(code)
+                    self.current_code_model_dataset[0] = code
+                    self.codeText.insertPlainText(code)
+
+        self.modelText.clear()
+        self.cur.execute(f"select tmp_code from commits where uuid = '{curr_obj}'")
+        for record in self.cur.fetchall():
+            if not record[0] == None:
+                for key, code in dict(record[0]).items():
+                    code = depars2(code)
+                    self.current_code_model_dataset[1] = code
+                    self.modelText.insertPlainText(code)
+        
+        self.datasetText.clear()
+        self.cur.execute(f"select tmp_dataset from commits where uuid = '{curr_obj}'")
+        for record in self.cur.fetchall():
+            if not record[0] == None:
+                for key, code in dict(record[0]).items():
+                    code = depars2(code)
+                    self.current_code_model_dataset[2] = code
+                    self.datasetText.insertPlainText(code)
+
+        #---------------------------------------------------------------------------summary description---------------------------------------------------------------------------------------
         # print(self.current_commit)
         self.cur.execute(f"select summary, description from commits where uuid = '{self.current_commit}'")
         for record in self.cur.fetchall():
             self.summary.setText(f"Summary: {record[0]}")
             self.description.setText(f"Description: {record[1]}")
 
+    #TODO: Сделать выделение UUID последнего коммита
     def change_code_model_dataset(self, curr_obj):
+        self.current_code_model_dataset = ["", "", ""]
         #TODO: сделать элегантнее
         self.codeText.clear()
-        self.cur.execute(f"select code from rep_storage where id = '{self.branches_name_id[curr_obj]}'")
-        for record in self.cur.fetchall():
-            if not record[0] == None:
-                for key, code in dict(record[0]).items():
-                    self.codeText.insertPlainText(code)
-
-        self.modelText.clear()
         self.cur.execute(f"select model from rep_storage where id = '{self.branches_name_id[curr_obj]}'")
         for record in self.cur.fetchall():
             if not record[0] == None:
                 for key, code in dict(record[0]).items():
+                    code = depars2(code)
+                    self.current_code_model_dataset[0] = code
+                    self.codeText.insertPlainText(code)
+
+        self.modelText.clear()
+        self.cur.execute(f"select code from rep_storage where id = '{self.branches_name_id[curr_obj]}'")
+        for record in self.cur.fetchall():
+            if not record[0] == None:
+                for key, code in dict(record[0]).items():
+                    code = depars2(code)
+                    self.current_code_model_dataset[1] = code
                     self.modelText.insertPlainText(code)
         
         self.datasetText.clear()
@@ -375,6 +487,8 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         for record in self.cur.fetchall():
             if not record[0] == None:
                 for key, code in dict(record[0]).items():
+                    code = depars2(code)
+                    self.current_code_model_dataset[2] = code
                     self.datasetText.insertPlainText(code)
         
         # self.lastCommitDate.clear()
@@ -445,6 +559,83 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         dialog.exec()
         # dialog.nameTextEdit.setText(str(self.login))
         # dialog.
+
+    def create_branch(self):
+        branch_dialog = CreateBranchDialog()
+
+        while True:
+            branch_dialog.exec()
+            err = False
+            branch_dialog.isdone = False
+            
+            inputs = [self.gen_uuid(type="br"), self.reps[self.current_rep],branch_dialog.getIputs()]
+            
+            sql_query = ", ".join(["'" + elem + "'" if elem is not None else "null" for elem in inputs])
+            try:
+                if not branch_dialog.is_cancel:
+                    self.cur.execute(odin_protection(f"insert into branch values({sql_query})"))
+                    branch_dialog.isdone = True
+            except(error):
+                err = True
+                print(error)
+                QMessageBox.critical(  
+                        None,
+                        "BRANCH CREATION ERROR",
+                        "The entered data is incorrect! Try again")
+            finally:
+                self.conn.commit()
+                if (branch_dialog.isdone and not err) or branch_dialog.is_cancel:
+                    break
+        
+        # self.set_repositories()
+        self.change_branch_view(self.current_rep, None)
+
+    def commit(self):
+        commit_dialog = CommitDialog()
+        c_m_ds = ["code", "model", "dataset"]
+
+        while True:
+            snippet = [self.modelText.toPlainText(), self.codeText.toPlainText(), self.datasetText.toPlainText()]
+            commit_dialog.exec()
+            commit_dialog.isdone = False
+            err = False
+            inputs = list(commit_dialog.getInputs())
+
+            flags, inputs = inputs[:3], inputs[3:]
+            [inputs.insert(elem[1], elem[0]) for elem in [(self.gen_uuid(type="c"), 0), (self.login, 0), (self.branches_name_id[self.current_branch], 0), ("NOW()", len(inputs) + 100)]]
+
+            for indx in range(len(flags)):
+                if flags[indx]:
+                    snip = pars2(snippet[indx])
+                    if self.current_code_model_dataset[indx] != snip:
+                        inputs.insert(len(inputs) + indx + 1, '{"' + c_m_ds[indx] + '": "' + " ".join(snip) + '"}')
+                        continue
+                    inputs.insert(len(inputs) + indx + 1, None)
+
+            try:
+                if not commit_dialog.is_cancel:
+                    print("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not None else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
+                    self.cur.execute("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not None else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
+                    commit_dialog.isdone = True
+
+            except(error):
+                err = True
+                print(error)
+                QMessageBox.critical(  
+                        None,
+                        "COMMIT ERROR",
+                        "The entered data is incorrect! Try again")
+            finally:
+                self.conn.commit()
+                if (commit_dialog.isdone and not err) or commit_dialog.is_cancel:
+                    break
+        
+        self.change_commit_view(self.current_branch)
+
+    # def delete_rep(self):
+    #     self.cur.execute()
+    # def get_commit_data(self):
+
 
 git = QtWidgets.QApplication(sys.argv)
 window = GithubApp()
