@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>297</height>
+    <width>311</width>
+    <height>303</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,6 +21,7 @@ QTextEdit {
 	color: rgb(255,255,255);
 	font: bold 18px
 }
+
 QLineEdit {
 	border: 2px solid rgb(0, 191, 255);
 	border-radius: 7px;
@@ -34,13 +35,19 @@ QPushButton {
     background-color: rgb(35, 134, 54);
     color: white;
 	font: bold 16px
+}
+QPushButton#regButton {
+    background-color: rgb(13, 17, 23);
+	border: 2px solid rgb(13, 17, 23); ;
+	color:rgb(0, 191, 255);
+	font: bold 14px
 }</string>
   </property>
   <widget class="QLineEdit" name="loginEdit">
    <property name="geometry">
     <rect>
-     <x>25</x>
-     <y>70</y>
+     <x>20</x>
+     <y>55</y>
      <width>271</width>
      <height>31</height>
     </rect>
@@ -52,8 +59,8 @@ QPushButton {
   <widget class="QPushButton" name="signButton">
    <property name="geometry">
     <rect>
-     <x>25</x>
-     <y>210</y>
+     <x>20</x>
+     <y>215</y>
      <width>271</width>
      <height>31</height>
     </rect>
@@ -65,8 +72,8 @@ QPushButton {
   <widget class="QTextEdit" name="loginTextEdit">
    <property name="geometry">
     <rect>
-     <x>25</x>
-     <y>30</y>
+     <x>20</x>
+     <y>15</y>
      <width>141</width>
      <height>31</height>
     </rect>
@@ -91,8 +98,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextEdit" name="passTextEdit">
    <property name="geometry">
     <rect>
-     <x>25</x>
-     <y>120</y>
+     <x>20</x>
+     <y>105</y>
      <width>141</width>
      <height>31</height>
     </rect>
@@ -117,8 +124,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QLineEdit" name="passEdit">
    <property name="geometry">
     <rect>
-     <x>25</x>
-     <y>160</y>
+     <x>20</x>
+     <y>145</y>
      <width>271</width>
      <height>31</height>
     </rect>
@@ -130,8 +137,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="exitButton">
    <property name="geometry">
     <rect>
-     <x>25</x>
-     <y>250</y>
+     <x>20</x>
+     <y>255</y>
      <width>271</width>
      <height>31</height>
     </rect>
@@ -147,6 +154,19 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text">
     <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="regButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Register</string>
    </property>
   </widget>
  </widget>

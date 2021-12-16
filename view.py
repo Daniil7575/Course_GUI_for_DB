@@ -1,6 +1,8 @@
 import github_ui8
 import login_dialog
+import user_creation_dialog
 import create_rep_dialog
+import user_info_dialog
 
 import sys
 import json
@@ -22,16 +24,113 @@ from PyQt5.QtWidgets import (
 )
 
 # DB_PARAMS_PATH = "db_connection.json"
+POSTGRES_LOGIN = "postgres"
+POSTGRES_PASS = "16912"
+
+def odin_protection(query):
+        black_list = ("--", ";", "\\", "/", "||", "chr(")
+
+        if any(el in query for el in black_list):
+            return ""
+        return query
+
+
+class UserInfoDialog(QDialog, user_info_dialog.Ui_Dialog):
+    def __init__(self, cur, login):
+        super().__init__()
+        self.setupUi(self)
+        self.setFixedSize(self.size())
+
+        # self.rejected.connect(self.exit)
+        self.statsButton.clicked.connect(lambda: self.stats(cur, login))
+        self.exitButton.clicked.connect(self.exit)
+    
+    def stats(self, cur, login):
+        try:
+            cur.execute(f"call developer_info('{login}')")
+            QMessageBox.information(  
+                        None,
+                        "USER STATS INFO",
+                        f"stats for user '{login}' have been successfully dumped on C:\\321.csv!")
+        except:
+            QMessageBox.critical(  
+                        None,
+                        "USER STATS ERROR",
+                        f"dumping stats have failed!")
+        # self.accept()
+    
+    def exit(self):
+        self.reject()
+
+
+class UserCreationDialog(QDialog, user_creation_dialog.Ui_Dialog):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.setFixedSize(self.size())
+
+        # self.rejected.connect(self.exit)
+        self.createUserButton.clicked.connect(self.getInputs)
+        self.cancelButton.clicked.connect(self.exit)
+    
+    def getInputs(self):
+        self.accept()
+        return (self.newUserLogin.text(), self.newUserName.text(), self.newUserAbout.text(), self.newUserGeo.text(), self.newUserPass.text())
+    
+    def exit(self):
+        self.is_cancel = True
+        self.reject()
 
 
 class LoginDialog(QDialog, login_dialog.Ui_Dialog):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setFixedSize(self.size())
 
+        self.regButton.clicked.connect(self.register)
         self.signButton.clicked.connect(self.getInputs)
         self.exitButton.clicked.connect(self.exit)
+
+    def register(self):
+        dialog = UserCreationDialog()
+
+        while True:
+            dialog.exec()
+            user_data = dialog.getInputs()
+            executed = False
+
+            try:
+                q_variables = [("'" + el + "'") if el != "" else 'null' for el in user_data]
+                conn = pg.connect(host="localhost",
+                                    database="CourseDB",
+                                    user=POSTGRES_LOGIN,
+                                    password=POSTGRES_PASS)
+                # print(f"insert into developer values({', '.join(q_variables)})")
+                conn.cursor().execute(odin_protection(f"insert into developer values({', '.join(q_variables)})"))
+                conn.cursor().execute(odin_protection(f"create user {user_data[0]} with encrypted password '{user_data[-1]}' in group \"Developer\", \"pg_write_server_files\" "))
+                executed = True
+            except:
+                if hasattr(dialog, "is_cancel") and dialog.is_cancel:
+                    break
+                # TODO: customize error window
+                QMessageBox.critical(  
+                        None,
+                        "USER CREATION ERROR",
+                        "Something wrong with new user data! Try again")
+            finally:
+                conn.commit()
+                if executed:
+                    # TODO: customize error window
+                    QMessageBox.information(  
+                        None,
+                        "USER CREATION INFO",
+                        f"user '{user_data[0]}' has been created!")
+                    break
+            
+            del(conn)
     
+
     def getInputs(self):
         self.accept()
         return (self.loginEdit.text(), self.passEdit.text())
@@ -44,6 +143,8 @@ class CreateRepDialog(QDialog, create_rep_dialog.Ui_Dialog):
     def __init__(self, login):
         super().__init__()
         self.setupUi(self)
+        self.setFixedSize(self.size())
+
         self.isdone = False
         self.is_cancel = False
         self.currentUser.setText(login)
@@ -87,10 +188,12 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.__paint_reps()  # без этого репы не красятся
+        
         self.login = self.establish_db_connection()
-        # self.showFullScreen()
         self.showMaximized()
+        
         self.set_repositories()
+        self.menuprofile.aboutToShow.connect(self.show_profile)
         self.newRepButton.clicked.connect(self.create_rep)
         # self.branchesComboBox.currentTextChanged.connect(self.change_commit_view)
     
@@ -106,13 +209,6 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         twlv = nd.generate(alphabet=alp, size=12)
 
         return oct + "-" + quads + "-" + twlv
-    
-    def __odin_protection(self, query):
-        black_list = ("--", ";", "\\", "/", "||")
-
-        if any(el in query for el in black_list):
-            return ""
-        return query
 
     def __paint_reps(self):  # TODO: move this function to the end of setupUi()
         for rep in range(self.repositoryList.count()):
@@ -289,8 +385,6 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         for i in a:
             self.lastCommitOwner.setText(f"last commit by {i[0]}") 
 
-    # def change_view(self):
-
     def create_rep(self):
         rep_dialog = CreateRepDialog(self.login)
 
@@ -337,10 +431,20 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                     break
             
         self.set_repositories()
-    
-    # def create_branch(self):
+
+    def show_profile(self):
+        dialog = UserInfoDialog(self.cur, self.login)
+        data = []
+        self.cur.execute(odin_protection(f"select * from developer where login = '{self.login}'"))
+        for el in self.cur.fetchall():
+            for eli in el:
+                data.append(eli)
+        for record, el in zip(data, [dialog.nameTextEdit, dialog.loginTextEdit, dialog.descTextEdit, dialog.geoTextEdit]):
+            el.setText(record) if record is not None else el.setText("N/A")
         
-    # def create_branch(self):
+        dialog.exec()
+        # dialog.nameTextEdit.setText(str(self.login))
+        # dialog.
 
 git = QtWidgets.QApplication(sys.argv)
 window = GithubApp()

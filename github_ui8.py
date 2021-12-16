@@ -28,7 +28,6 @@ class Ui_MainWindow(object):
 "QFrame { border: 2px solid rgb(0, 191, 255) } \n"
 "QComboBox QAbstractItemView {\n"
 "  border: 2px solid rgb(128, 0, 128);\n"
-"  background: white;\n"
 "  selection-background-color: grey;\n"
 "}\n"
 "QComboBox {\n"
@@ -225,15 +224,15 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1910, 26))
         self.menubar.setObjectName("menubar")
-        self.menureps = QtWidgets.QMenu(self.menubar)
-        self.menureps.setObjectName("menureps")
+        # self.menureps = QtWidgets.QMenu(self.menubar)
+        # self.menureps.setObjectName("menureps")
         self.menuprofile = QtWidgets.QMenu(self.menubar)
         self.menuprofile.setObjectName("menuprofile")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.menubar.addAction(self.menureps.menuAction())
+        # self.menubar.addAction(self.menureps.menuAction())
         self.menubar.addAction(self.menuprofile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -295,5 +294,5 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
-        self.menureps.setTitle(_translate("MainWindow", "reps"))
+        # self.menureps.setTitle(_translate("MainWindow", "reps"))
         self.menuprofile.setTitle(_translate("MainWindow", "profile"))
