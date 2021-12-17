@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import (
 
 # DB_PARAMS_PATH = "db_connection.json"
 POSTGRES_LOGIN = "postgres"
-POSTGRES_PASS = "246509"
+POSTGRES_PASS = "16912"
 
 
 def odin_protection(query: str):
@@ -96,7 +96,7 @@ class UserCreationDialog(QDialog, user_creation_dialog.Ui_Dialog):
         self.setupUi(self)
         self.setFixedSize(self.size())
 
-        # self.rejected.connect(self.exit)
+        self.rejected.connect(self.exit)
         self.createUserButton.clicked.connect(self.getInputs)
         self.cancelButton.clicked.connect(self.exit)
     
@@ -106,7 +106,7 @@ class UserCreationDialog(QDialog, user_creation_dialog.Ui_Dialog):
     
     def exit(self):
         self.is_cancel = True
-        self.reject()
+        self.accept()
 
 
 class LoginDialog(QDialog, login_dialog.Ui_Dialog):
@@ -118,6 +118,7 @@ class LoginDialog(QDialog, login_dialog.Ui_Dialog):
         self.regButton.clicked.connect(self.register)
         self.signButton.clicked.connect(self.getInputs)
         self.exitButton.clicked.connect(self.exit)
+        self.rejected.connect(self.exit)
 
     def register(self):
         dialog = UserCreationDialog()
@@ -133,7 +134,6 @@ class LoginDialog(QDialog, login_dialog.Ui_Dialog):
                                     database="CourseDB",
                                     user=POSTGRES_LOGIN,
                                     password=POSTGRES_PASS)
-                # print(f"insert into developer values({', '.join(q_variables)})")
                 conn.cursor().execute(odin_protection(f"insert into developer values({', '.join(q_variables)})"))
                 conn.cursor().execute(odin_protection(f"create user {user_data[0]} with encrypted password '{user_data[-1]}' in group \"Developer\", \"pg_write_server_files\" "))
                 executed = True
@@ -175,7 +175,7 @@ class CreateRepDialog(QDialog, create_rep_dialog.Ui_Dialog):
         self.isdone = False
         self.is_cancel = False
         self.currentUser.setText(login)
-        # self.rejected.connect(self.exit)
+        self.rejected.connect(self.exit)
 
         self.createRepButton.clicked.connect(self.getIputs)
         self.cancelButton.clicked.connect(self.exit)
@@ -188,7 +188,7 @@ class CreateRepDialog(QDialog, create_rep_dialog.Ui_Dialog):
     
     def exit(self):
         self.is_cancel = True
-        self.reject()
+        self.accept()
 
 
 class CreateBranchDialog(QDialog, create_branch_dialog.Ui_Dialog):
@@ -213,14 +213,18 @@ class CreateBranchDialog(QDialog, create_branch_dialog.Ui_Dialog):
 
 
 class CommitDialog(QDialog, commit_dialog.Ui_Dialog):
-    def __init__(self):
+    def __init__(self, rep, branch, usr):
         super().__init__()
         self.setupUi(self)
         self.setFixedSize(self.size())
 
         self.isdone = False
         self.is_cancel = False
+        self.currentRep.setText(rep)
+        self.currentBranch.setText(branch)
+        self.currentUser.setText(usr)
 
+        self.rejected.connect(self.exit)
         self.commitButton.clicked.connect(self.getInputs)
         self.cancelButton.clicked.connect(self.exit)
 
@@ -230,7 +234,7 @@ class CommitDialog(QDialog, commit_dialog.Ui_Dialog):
         
     def exit(self):
         self.is_cancel = True
-        self.reject()
+        self.accept()
     
 
 class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
@@ -294,7 +298,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         while True:
             dialog.exec()
             login_data = dialog.getInputs()
-            login_data = ['bebroid', '123']
+            # login_data = ['bebroid', '123']
             try:
                 self.conn = pg.connect(host="localhost",
                                     database="CourseDB",
@@ -398,6 +402,14 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             # print(self.branches_name_id)
             self.branchesComboBox.addItem(record[1])
         
+        info = [self.description_3, self.description_2, self.description_4]
+        self.cur.execute(odin_protection(f"select description, languages, tags from repository where name = '{self.current_rep.split('/')[-1]}'"))
+        for record in self.cur.fetchall():
+            for eli, text in zip(record, info):
+                text.setText(eli) if not isinstance(eli, list) else text.setText(", ".join(eli))
+
+
+        
         # self.change_commit_view()
 
         # self.branchesComboBox.currentTextChanged.disconnect(self)
@@ -421,39 +433,75 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
     
         # self.commitsComboBox.currentTextChanged.connect(lambda: self.change_code_model_dataset(curr_obj)) 
         self.cur.execute(f"select branch_id, usr_login, uuid from commits where branch_id = '{self.branches_name_id[self.current_branch]}'")
+        self.commits = []
         for record in self.cur.fetchall():
-            self.commitsComboBox.addItem(record[2])
+            self.commits.append(record[2])
+        # self.commitsComboBox.addItem()
+        self.commitsComboBox.addItems([el if id != 1 else el + " (last commit)" for id, el in enumerate(["branch storage"] + self.commits[::-1])])
         
         self.change_code_model_dataset(self.current_branch)
     
     def change_sum_desc_tmps(self, curr_obj):
         self.current_code_model_dataset = ["", "", ""]
-        self.current_commit = curr_obj
 
+        # PIZDEC, SLISHKOM MNOGO ODINAKOVOGO KODA
+        if curr_obj == "branch storage":
+            self.codeText.clear()
+            self.cur.execute(odin_protection(f"select model from rep_storage where id = '{self.branches_name_id[self.current_branch]}'"))
+            for record in self.cur.fetchall():
+                if not record[0] == None:
+                    for _, code in dict(record[0]).items():
+                        code = depars2(code)
+                        self.current_code_model_dataset[0] = code
+                        self.codeText.insertPlainText(code)
+
+            self.modelText.clear()
+            self.cur.execute(odin_protection(f"select code from rep_storage where id = '{self.branches_name_id[self.current_branch]}'"))
+            for record in self.cur.fetchall():
+                if not record[0] == None:
+                    for _, code in dict(record[0]).items():
+                        code = depars2(code)
+                        self.current_code_model_dataset[1] = code
+                        self.modelText.insertPlainText(code)
+            
+            self.datasetText.clear()
+            self.cur.execute(odin_protection(f"select dataset from rep_storage where id = '{self.branches_name_id[self.current_branch]}'"))
+            for record in self.cur.fetchall():
+                if not record[0] == None:
+                    for _, code in dict(record[0]).items():
+                        code = depars2(code)
+                        self.current_code_model_dataset[2] = code
+                        self.datasetText.insertPlainText(code)
+
+            self.summary.setText(f"Commit summary: branch storage is active")
+            self.description.setText(f"Commit description: branch storage is active")
+            return
+                
+        self.current_commit = curr_obj.replace("(last commit)", "").strip()
         #---------------------------------------------------------------------------code model dataset----------------------------------------------------------------------
         self.codeText.clear()
-        self.cur.execute(f"select tmp_model from commits where uuid = '{curr_obj}'")
+        self.cur.execute(odin_protection(f"select tmp_model from commits where uuid = '{self.current_commit}'"))
         for record in self.cur.fetchall():
             if not record[0] == None:
-                for key, code in dict(record[0]).items():
+                for _, code in dict(record[0]).items():
                     code = depars2(code)
                     self.current_code_model_dataset[0] = code
                     self.codeText.insertPlainText(code)
 
         self.modelText.clear()
-        self.cur.execute(f"select tmp_code from commits where uuid = '{curr_obj}'")
+        self.cur.execute(odin_protection(f"select tmp_code from commits where uuid = '{self.current_commit}'"))
         for record in self.cur.fetchall():
             if not record[0] == None:
-                for key, code in dict(record[0]).items():
+                for _, code in dict(record[0]).items():
                     code = depars2(code)
                     self.current_code_model_dataset[1] = code
                     self.modelText.insertPlainText(code)
         
         self.datasetText.clear()
-        self.cur.execute(f"select tmp_dataset from commits where uuid = '{curr_obj}'")
+        self.cur.execute(odin_protection(f"select tmp_dataset from commits where uuid = '{self.current_commit}'"))
         for record in self.cur.fetchall():
             if not record[0] == None:
-                for key, code in dict(record[0]).items():
+                for _, code in dict(record[0]).items():
                     code = depars2(code)
                     self.current_code_model_dataset[2] = code
                     self.datasetText.insertPlainText(code)
@@ -462,8 +510,8 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         # print(self.current_commit)
         self.cur.execute(f"select summary, description from commits where uuid = '{self.current_commit}'")
         for record in self.cur.fetchall():
-            self.summary.setText(f"Summary: {record[0]}")
-            self.description.setText(f"Description: {record[1]}")
+            self.summary.setText(f"Commit summary: {record[0]}")
+            self.description.setText(f"Commit description: {record[1]}")
 
     #TODO: Сделать выделение UUID последнего коммита
     def change_code_model_dataset(self, curr_obj):
@@ -473,7 +521,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.cur.execute(f"select model from rep_storage where id = '{self.branches_name_id[curr_obj]}'")
         for record in self.cur.fetchall():
             if not record[0] == None:
-                for key, code in dict(record[0]).items():
+                for _, code in dict(record[0]).items():
                     code = depars2(code)
                     self.current_code_model_dataset[0] = code
                     self.codeText.insertPlainText(code)
@@ -482,7 +530,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.cur.execute(f"select code from rep_storage where id = '{self.branches_name_id[curr_obj]}'")
         for record in self.cur.fetchall():
             if not record[0] == None:
-                for key, code in dict(record[0]).items():
+                for _, code in dict(record[0]).items():
                     code = depars2(code)
                     self.current_code_model_dataset[1] = code
                     self.modelText.insertPlainText(code)
@@ -491,18 +539,19 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.cur.execute(f"select dataset from rep_storage where id = '{self.branches_name_id[curr_obj]}'")
         for record in self.cur.fetchall():
             if not record[0] == None:
-                for key, code in dict(record[0]).items():
+                for _, code in dict(record[0]).items():
                     code = depars2(code)
                     self.current_code_model_dataset[2] = code
                     self.datasetText.insertPlainText(code)
         
         # self.lastCommitDate.clear()
         print(self.branches_name_id[curr_obj])
-        self.cur.execute(f"select usr_login from commits where uuid = (select last_commit_uuid from rep_storage where id = '{self.branches_name_id[curr_obj]}')")
+        self.cur.execute(f"select usr_login, commit_date from commits where uuid = (select last_commit_uuid from rep_storage where id = '{self.branches_name_id[curr_obj]}')")
         self.lastCommitOwner.setText(f"there are no commits")
         a = self.cur.fetchall()
         for i in a:
             self.lastCommitOwner.setText(f"last commit by {i[0]}") 
+            self.lastCommitDate.setText(f"on {i[1]}") 
 
     def create_rep(self):
         rep_dialog = CreateRepDialog(self.login)
@@ -596,7 +645,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.change_branch_view(self.current_rep, None)
 
     def commit(self):
-        commit_dialog = CommitDialog()
+        commit_dialog = CommitDialog(self.current_rep, self.current_branch, self.login)
         c_m_ds = ["code", "model", "dataset"]
 
         while True:
@@ -605,6 +654,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             commit_dialog.isdone = False
             err = False
             inputs = list(commit_dialog.getInputs())
+
 
             flags, inputs = inputs[:3], inputs[3:]
             [inputs.insert(elem[1], elem[0]) for elem in [(self.gen_uuid(type="c"), 0), (self.login, 0), (self.branches_name_id[self.current_branch], 0), ("NOW()", len(inputs) + 100)]]
@@ -619,9 +669,10 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                     inputs.insert(len(inputs) + indx + 1, None)    
 
             try:
+                if inputs[3] == "": raise IOError("summary is empty")  # summary is empty
                 if not commit_dialog.is_cancel:
-                    print("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not None else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
-                    self.cur.execute("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not None else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
+                    print("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not (None or "") else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
+                    self.cur.execute("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not (None or "") else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
                     commit_dialog.isdone = True
 
             except(error):
@@ -640,7 +691,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
 
     def delete_rep(self):
         try:
-            self.cur.execute(f"delete from repository where id = '{self.reps[self.current_rep]}'")
+            self.cur.execute(odin_protection(f"delete from repository where id = '{self.reps[self.current_rep]}'"))
         except:
              QMessageBox.critical(  
                         None,
