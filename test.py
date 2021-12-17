@@ -120,4 +120,4 @@ class GithubApp(QMainWindow, github_ui.Ui_MainWindow):
 
 a = [1, 2, 3, 4]
 # a.insert(len(a), 5)
-print(a)
+print(type(None))

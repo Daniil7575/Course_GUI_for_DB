@@ -15,7 +15,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(311, 303)
-        Dialog.setStyleSheet("QWidget { background-color: rgb(13, 17, 23); } \n"
+        Dialog.setStyleSheet("QWidget { background-color: rgb(13, 17, 23);\n color: white; } \n"
 "/* QFrame { border: 2px solid rgb(0, 191, 255) } */\n"
 "QTextEdit {\n"
 "    background-color: rgb(13, 17, 23);\n"
@@ -42,7 +42,8 @@ class Ui_Dialog(object):
 "    border: 2px solid rgb(13, 17, 23); ;\n"
 "    color:rgb(0, 191, 255);\n"
 "    font: bold 14px\n"
-"}")
+"}\n")
+
         self.loginEdit = QtWidgets.QLineEdit(Dialog)
         self.loginEdit.setGeometry(QtCore.QRect(20, 55, 271, 31))
         self.loginEdit.setText("")

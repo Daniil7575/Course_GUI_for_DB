@@ -5,8 +5,9 @@ import create_rep_dialog
 import create_branch_dialog
 import user_info_dialog
 import commit_dialog
+import delete_dialog
 
-from os import error
+from os import device_encoding, error, listdir
 import sys
 import json
 import re
@@ -24,12 +25,13 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QDialogButtonBox,
     QFormLayout,
+    QWidget,
 )
 
 
 # DB_PARAMS_PATH = "db_connection.json"
 POSTGRES_LOGIN = "postgres"
-POSTGRES_PASS = "16912"
+POSTGRES_PASS = "246509"
 
 
 def odin_protection(query: str):
@@ -76,12 +78,12 @@ class UserInfoDialog(QDialog, user_info_dialog.Ui_Dialog):
         try:
             cur.execute(f"call developer_info('{login}')")
             QMessageBox.information(  
-                        None,
+                        LoginDialog(),
                         "USER STATS INFO",
                         f"stats for user '{login}' have been successfully dumped on C:\\321.csv!")
         except:
             QMessageBox.critical(  
-                        None,
+                        LoginDialog(),
                         "USER STATS ERROR",
                         f"dumping stats have failed!")
         # self.accept()
@@ -142,7 +144,7 @@ class LoginDialog(QDialog, login_dialog.Ui_Dialog):
                     break
                 # TODO: customize error window
                 QMessageBox.critical(  
-                        None,
+                        LoginDialog(),
                         "USER CREATION ERROR",
                         "Something wrong with new user data! Try again")
             finally:
@@ -237,6 +239,34 @@ class CommitDialog(QDialog, commit_dialog.Ui_Dialog):
         self.accept()
     
 
+class DelDialog(QDialog, delete_dialog.Ui_Dialog):
+    def __init__(self, line):
+        super().__init__()
+        self.setupUi(self)
+        self.setFixedSize(self.size())
+        self.flag = False
+        self.deleteEdit.setText(f"Are you sure you want to delete {line}?")
+
+        # self.rejected.connect(self.flse)
+        self.submitButton.clicked.connect(self.tru)
+        self.exitButton.clicked.connect(self.flse)
+
+    # def submit(self):
+    #     self.accept()
+    #     return self.flag
+
+    def flse(self):
+        self.flag = False
+        self.reject()
+    
+    def tru(self):
+        self.flag = True
+        self.reject()
+    # def cancel(self):
+    #     self.accept()
+        # return False
+
+
 class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
     current_rep = None
     reps = {}
@@ -271,6 +301,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.newBranchButton.clicked.connect(self.create_branch)
         self.commitButton.clicked.connect(self.commit)
         self.deleteRepButton.clicked.connect(self.delete_rep)
+        self.deleteBranchButton.clicked.connect(self.delete_branch)
         # self.branchesComboBox.currentTextChanged.connect(self.change_commit_view)
     
     def gen_uuid(self, alp="abcdef1234567890", type='rep'):
@@ -298,7 +329,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         while True:
             dialog.exec()
             login_data = dialog.getInputs()
-            # login_data = ['bebroid', '123']
+            login_data = ['bebroid', '123']
             try:
                 self.conn = pg.connect(host="localhost",
                                     database="CourseDB",
@@ -307,7 +338,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             except:
                 # TODO: customize error window
                 QMessageBox.critical(  
-                        None,
+                        dialog,
                         "LOGIN ERROR",
                         "Login or password is incorrect! Try again")
             finally:
@@ -400,16 +431,20 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         for record in self.cur.fetchall():
             self.branches_name_id[record[1]] = record[0]
             # print(self.branches_name_id)
-            self.branchesComboBox.addItem(record[1])
+            self.branchesComboBox.addItem(record[1])     
         
-        info = [self.description_3, self.description_2, self.description_4]
+        # print(odin_protection(f"select description, languages, tags from repository where name = '{self.current_rep.split('/')[-1]}'"))
+        
         self.cur.execute(odin_protection(f"select description, languages, tags from repository where name = '{self.current_rep.split('/')[-1]}'"))
         for record in self.cur.fetchall():
-            for eli, text in zip(record, info):
-                text.setText(eli) if not isinstance(eli, list) else text.setText(", ".join(eli))
-
-
-        
+            for eli, text, dlt in zip(record, [self.description_3, self.description_2, self.description_4], ["Rep desc: ", "Rep langs: ", "Rep tags: "]):
+                if isinstance(eli, type(None)):
+                    eli = "N/A"
+                if isinstance(eli, list):
+                    eli = ", ".join(eli)
+                text.setText(dlt + eli)
+                # text.setText(line) if not isinstance(eli, list) else text.setText(", ".join(eli))
+                
         # self.change_commit_view()
 
         # self.branchesComboBox.currentTextChanged.disconnect(self)
@@ -545,7 +580,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                     self.datasetText.insertPlainText(code)
         
         # self.lastCommitDate.clear()
-        print(self.branches_name_id[curr_obj])
+        # print(self.branches_name_id[curr_obj])
         self.cur.execute(f"select usr_login, commit_date from commits where uuid = (select last_commit_uuid from rep_storage where id = '{self.branches_name_id[curr_obj]}')")
         self.lastCommitOwner.setText(f"there are no commits")
         a = self.cur.fetchall()
@@ -589,7 +624,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                 # TODO: customize error window
                 error = True
                 QMessageBox.critical(  
-                        None,
+                        LoginDialog(),
                         "REPOSITORY CREATION ERROR",
                         "The entered data is incorrect! Try again")
                         
@@ -633,7 +668,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                 err = True
                 print(error)
                 QMessageBox.critical(  
-                        None,
+                        LoginDialog(),
                         "BRANCH CREATION ERROR",
                         "The entered data is incorrect! Try again")
             finally:
@@ -671,7 +706,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             try:
                 if inputs[3] == "": raise IOError("summary is empty")  # summary is empty
                 if not commit_dialog.is_cancel:
-                    print("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not (None or "") else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
+                    # print("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not (None or "") else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
                     self.cur.execute("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not (None or "") else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
                     commit_dialog.isdone = True
 
@@ -679,7 +714,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                 err = True
                 print(error)
                 QMessageBox.critical(  
-                        None,
+                        LoginDialog(),
                         "COMMIT ERROR",
                         "The entered data is incorrect! Try again")
             finally:
@@ -690,18 +725,40 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.change_commit_view(self.current_branch)
 
     def delete_rep(self):
-        try:
-            self.cur.execute(odin_protection(f"delete from repository where id = '{self.reps[self.current_rep]}'"))
-        except:
-             QMessageBox.critical(  
-                        None,
+        del_dialog = DelDialog(f"repository:\n{self.current_rep}")
+        del_dialog.exec()
+
+        # is_submit = del_dialog.submit()
+
+        if del_dialog.flag:
+            try:
+                self.cur.execute(odin_protection(f"delete from repository where id = '{self.reps[self.current_rep]}'"))
+            except:
+                QMessageBox.critical(  
+                        LoginDialog(),
                         "DELETE ERROR",
                         "Something goes wrong!")
-        finally:
-            self.conn.commit()
-            self.set_repositories()
+            finally:
+                self.conn.commit()
+                self.set_repositories()
+                self.change_branch_view(list(self.reps.keys())[0], None)
 
-   
+    def delete_branch(self):
+        del_dialog = DelDialog(f"branch:\n{self.current_branch}")
+        del_dialog.exec()
+
+        if del_dialog.flag:
+            try:
+                self.cur.execute(odin_protection(f"delete from branch where id = '{self.branches_name_id[self.current_branch]}'"))
+            except:
+                QMessageBox.critical(  
+                        LoginDialog(),
+                        "DELETE ERROR",
+                        "Something goes wrong!")
+            finally:
+                self.conn.commit()
+                self.change_branch_view(self.current_rep, None)
+                self.change_commit_view(list(self.branches_name_id.keys())[0])
 
 
 git = QtWidgets.QApplication(sys.argv)
