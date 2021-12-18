@@ -7,7 +7,7 @@ import user_info_dialog
 import commit_dialog
 import delete_dialog
 
-from os import device_encoding, error, listdir
+from os import error
 import sys
 import json
 import re
@@ -19,13 +19,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (
     QMainWindow,
     QMessageBox,
-    QTableWidget,
-    QTableWidgetItem,
     QDialog,
-    QLineEdit,
-    QDialogButtonBox,
-    QFormLayout,
-    QWidget,
 )
 
 
@@ -296,12 +290,13 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.showMaximized()
         
         self.set_repositories()
-        self.menuprofile.aboutToShow.connect(self.show_profile)
+        self.menuprofile.aboutToShow.connect(lambda: self.show_profile(self.login))
         self.newRepButton.clicked.connect(self.create_rep)
         self.newBranchButton.clicked.connect(self.create_branch)
         self.commitButton.clicked.connect(self.commit)
         self.deleteRepButton.clicked.connect(self.delete_rep)
         self.deleteBranchButton.clicked.connect(self.delete_branch)
+        self.lastCommitOwner.clicked.connect(lambda: self.show_profile(self.lastCommitOwner.text().split(" ")[-1]))
         # self.branchesComboBox.currentTextChanged.connect(self.change_commit_view)
     
     def gen_uuid(self, alp="abcdef1234567890", type='rep'):
@@ -405,7 +400,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         #         self.reps[inner_el[0]] = inner_el[1]
         self.__paint_reps()
 
-    def change_branch_view(self, curr_obj, prev_obj):
+    def change_branch_view(self, curr_obj, _):
         try:
             self.branchesComboBox.currentTextChanged.disconnect(self.change_commit_view)
         except:
@@ -635,10 +630,10 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             
         self.set_repositories()
 
-    def show_profile(self):
-        dialog = UserInfoDialog(self.cur, self.login)
+    def show_profile(self, login):
+        dialog = UserInfoDialog(self.cur, login)
         data = []
-        self.cur.execute(odin_protection(f"select * from developer where login = '{self.login}'"))
+        self.cur.execute(odin_protection(f"select * from developer where login = '{login}'"))
         for el in self.cur.fetchall():
             for eli in el:
                 data.append(eli)
