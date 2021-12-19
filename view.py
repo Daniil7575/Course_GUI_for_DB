@@ -9,7 +9,6 @@ import delete_dialog
 
 from os import error
 import sys
-import json
 import re
 
 import psycopg2 as pg
@@ -74,7 +73,7 @@ class UserInfoDialog(QDialog, user_info_dialog.Ui_Dialog):
             QMessageBox.information(  
                         LoginDialog(),
                         "USER STATS INFO",
-                        f"stats for user '{login}' have been successfully dumped on C:\\321.csv!")
+                        f"stats for user '{login}' have been successfully dumped!")
         except:
             QMessageBox.critical(  
                         LoginDialog(),
@@ -131,7 +130,7 @@ class LoginDialog(QDialog, login_dialog.Ui_Dialog):
                                     user=POSTGRES_LOGIN,
                                     password=POSTGRES_PASS)
                 conn.cursor().execute(odin_protection(f"insert into developer values({', '.join(q_variables)})"))
-                conn.cursor().execute(odin_protection(f"create user {user_data[0]} with encrypted password '{user_data[-1]}' in group \"Developer\", \"pg_write_server_files\" "))
+                conn.cursor().execute(odin_protection(f"create user \"{user_data[0]}\" with encrypted password '{user_data[-1]}' in group \"Developer\", \"pg_write_server_files\" "))
                 executed = True
             except:
                 if hasattr(dialog, "is_cancel") and dialog.is_cancel:
@@ -146,7 +145,7 @@ class LoginDialog(QDialog, login_dialog.Ui_Dialog):
                 if executed:
                     # TODO: customize error window
                     QMessageBox.information(  
-                        None,
+                        LoginDialog(),
                         "USER CREATION INFO",
                         f"user '{user_data[0]}' has been created!")
                     break
@@ -296,6 +295,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         self.commitButton.clicked.connect(self.commit)
         self.deleteRepButton.clicked.connect(self.delete_rep)
         self.deleteBranchButton.clicked.connect(self.delete_branch)
+        self.deleteCommitButton.clicked.connect(self.delete_commit)
         self.lastCommitOwner.clicked.connect(lambda: self.show_profile(self.lastCommitOwner.text().split(" ")[-1]))
         # self.branchesComboBox.currentTextChanged.connect(self.change_commit_view)
     
@@ -324,7 +324,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         while True:
             dialog.exec()
             login_data = dialog.getInputs()
-            login_data = ['bebroid', '123']
+            login_data = ['supercoder008', 'Qj4Yv ']
             try:
                 self.conn = pg.connect(host="localhost",
                                     database="CourseDB",
@@ -467,7 +467,10 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         for record in self.cur.fetchall():
             self.commits.append(record[2])
         # self.commitsComboBox.addItem()
-        self.commitsComboBox.addItems([el if id != 1 else el + " (last commit)" for id, el in enumerate(["branch storage"] + self.commits[::-1])])
+        self.cur.execute(f"select last_commit_uuid from rep_storage where id = '{self.branches_name_id[self.current_branch]}'")
+        self.last_commit = self.cur.fetchall()[0][0]
+
+        self.commitsComboBox.addItems([el if el != self.last_commit else el + " (last commit)" for  el in ["branch storage"] + self.commits[::-1]])
         
         self.change_code_model_dataset(self.current_branch)
     
@@ -508,6 +511,9 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             return
                 
         self.current_commit = curr_obj.replace("(last commit)", "").strip()
+
+        self.cur.execute(odin_protection(f"select usr_login from commits where uuid = '{self.current_commit}'"))
+        self.current_commit_owner = self.cur.fetchall()[0][0]
         #---------------------------------------------------------------------------code model dataset----------------------------------------------------------------------
         self.codeText.clear()
         self.cur.execute(odin_protection(f"select tmp_model from commits where uuid = '{self.current_commit}'"))
@@ -543,7 +549,6 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             self.summary.setText(f"Commit summary: {record[0]}")
             self.description.setText(f"Commit description: {record[1]}")
 
-    #TODO: Сделать выделение UUID последнего коммита
     def change_code_model_dataset(self, curr_obj):
         self.current_code_model_dataset = ["", "", ""]
         #TODO: сделать элегантнее
@@ -702,7 +707,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                 if inputs[3] == "": raise IOError("summary is empty")  # summary is empty
                 if not commit_dialog.is_cancel:
                     # print("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not (None or "") else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
-                    self.cur.execute("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem is not (None or "") else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
+                    self.cur.execute("insert into commits values(" + odin_protection(", ".join([f"'{elem}'" if elem not in ("None", "", None) else "null" for elem in inputs]).replace("'NOW()'", "NOW()")) + ")")
                     commit_dialog.isdone = True
 
             except(error):
@@ -727,14 +732,18 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
 
         if del_dialog.flag:
             try:
+                self.cur.execute("begin")
                 self.cur.execute(odin_protection(f"delete from repository where id = '{self.reps[self.current_rep]}'"))
+                self.conn.commit()
             except:
+                self.conn.rollback()
+
                 QMessageBox.critical(  
                         LoginDialog(),
                         "DELETE ERROR",
                         "Something goes wrong!")
             finally:
-                self.conn.commit()
+                # self.conn.commit()
                 self.set_repositories()
                 self.change_branch_view(list(self.reps.keys())[0], None)
 
@@ -743,17 +752,67 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         del_dialog.exec()
 
         if del_dialog.flag:
+            if self.current_branch == "master":
+                QMessageBox.critical(  
+                        LoginDialog(),
+                        "DELETE ERROR",
+                        "You can't delete master branch!")
+                return
+
+            if self.login != self.current_rep.split("/")[0]:
+                QMessageBox.critical(  
+                        LoginDialog(),
+                        "DELETE ERROR",
+                        "You can't delete a branch since you are not the author of this repository!")
+                return
             try:
+                self.cur.execute("begin")
                 self.cur.execute(odin_protection(f"delete from branch where id = '{self.branches_name_id[self.current_branch]}'"))
+                self.conn.commit()
             except:
+                self.conn.rollback()
                 QMessageBox.critical(  
                         LoginDialog(),
                         "DELETE ERROR",
                         "Something goes wrong!")
             finally:
-                self.conn.commit()
+                # self.conn.commit()
                 self.change_branch_view(self.current_rep, None)
                 self.change_commit_view(list(self.branches_name_id.keys())[0])
+
+    def delete_commit(self):
+        del_dialog = DelDialog(f"commit:\n{self.current_commit}")
+        del_dialog.exec()
+
+        if del_dialog.flag:
+            if self.current_branch == "branch storage" or self.last_commit == self.current_commit:
+                QMessageBox.critical(  
+                        LoginDialog(),
+                        "DELETE ERROR",
+                        "You can't delete branch storage or last commit!")
+                return
+            if self.login not in [self.current_rep.split("/")[0], self.current_commit_owner]:
+                QMessageBox.critical(  
+                        LoginDialog(),
+                        "DELETE ERROR",
+                        "Нou can't delete this commit because you are not the author of this repository or the author of this commit!")
+                return
+            try:
+                self.cur.execute("begin")
+                self.cur.execute(odin_protection(f"delete from commits where uuid = '{self.current_commit}'"))
+                self.conn.commit()
+            except error:
+                print(error)
+                self.conn.rollback()
+                QMessageBox.critical(  
+                        LoginDialog(),
+                        "DELETE ERROR",
+                        "Something goes wrong!")
+            finally:
+                # self.conn.commit()
+                # self.change_branch_view(self.current_rep, None)
+                self.change_commit_view(self.current_branch)
+                self.change_sum_desc_tmps(self.commits[0])
 
 
 git = QtWidgets.QApplication(sys.argv)

@@ -126,7 +126,7 @@ class Ui_Dialog(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:18px; font-weight:600; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:18px; font-weight:400;\">Geolocation </span><span style=\" font-size:9pt; font-weight:400; color:#6d6d6d;\">(optional)</span></p></body></html>"))
-        self.createUserButton.setText(_translate("Dialog", "Create repository"))
+        self.createUserButton.setText(_translate("Dialog", "Register"))
         self.cancelButton.setText(_translate("Dialog", "Cancel"))
         self.passTextEdit.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
