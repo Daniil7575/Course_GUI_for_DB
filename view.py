@@ -29,11 +29,11 @@ POSTGRES_PASS = "16912"
 
 
 def odin_protection(query: str):
-        black_list = ("--", ";", "\\", "/", "||", "chr(")
+    black_list = ("--", ";", "\\", "/", "||", "chr(")
 
-        if any(el in query.replace("\\n", "").replace("\n", "") for el in black_list):
-            return ""
-        return query
+    if any(el in query for el in black_list):
+        return ""
+    return query
 
 
 def pars2(string):
@@ -70,7 +70,7 @@ class UserInfoDialog(QDialog, user_info_dialog.Ui_Dialog):
     
     def stats(self, cur, login):
         try:
-            cur.execute(f"call developer_info('{login}')")
+            cur.execute(odin_protection(f"call developer_info('{login}')"))
             QMessageBox.information(  
                         LoginDialog(),
                         "USER STATS INFO",
@@ -327,6 +327,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
             dialog.exec()
             login_data = dialog.getInputs()
             # login_data = ['supercoder008', 'Qj4Yv ']
+            # login_data = ['bebroid', '123']
             try:
                 self.conn = pg.connect(host="localhost",
                                     database="CourseDB",
