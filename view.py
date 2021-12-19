@@ -16,6 +16,7 @@ import nanoid as nd
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (
+    QLineEdit,
     QMainWindow,
     QMessageBox,
     QDialog,
@@ -24,7 +25,7 @@ from PyQt5.QtWidgets import (
 
 # DB_PARAMS_PATH = "db_connection.json"
 POSTGRES_LOGIN = "postgres"
-POSTGRES_PASS = "246509"
+POSTGRES_PASS = "16912"
 
 
 def odin_protection(query: str):
@@ -110,6 +111,7 @@ class LoginDialog(QDialog, login_dialog.Ui_Dialog):
         self.setupUi(self)
         self.setFixedSize(self.size())
 
+        self.passEdit.setEchoMode(QLineEdit.Password)
         self.regButton.clicked.connect(self.register)
         self.signButton.clicked.connect(self.getInputs)
         self.exitButton.clicked.connect(self.exit)
@@ -129,7 +131,7 @@ class LoginDialog(QDialog, login_dialog.Ui_Dialog):
                                     database="CourseDB",
                                     user=POSTGRES_LOGIN,
                                     password=POSTGRES_PASS)
-                conn.cursor().execute(odin_protection(f"insert into developer values({', '.join(q_variables)})"))
+                conn.cursor().execute(odin_protection(f"insert into developer values({(', '.join(q_variables[0:-1]))})"))
                 conn.cursor().execute(odin_protection(f"create user \"{user_data[0]}\" with encrypted password '{user_data[-1]}' in group \"Developer\", \"pg_write_server_files\" "))
                 executed = True
             except:
@@ -324,7 +326,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         while True:
             dialog.exec()
             login_data = dialog.getInputs()
-            login_data = ['supercoder008', 'Qj4Yv ']
+            # login_data = ['supercoder008', 'Qj4Yv ']
             try:
                 self.conn = pg.connect(host="localhost",
                                     database="CourseDB",
