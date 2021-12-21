@@ -1,5 +1,5 @@
 from typing import get_origin
-import github_ui
+# import github_ui
 import nanoid as nd
 import login_dialog
 import sys
@@ -118,6 +118,10 @@ class GithubApp(QMainWindow, github_ui.Ui_MainWindow):
 # git.exec()
 # print(f"{nd.generate(alphabet='abcdef1234567890', size=8)}-{nd.generate(alphabet='abcdef1234567890', size=4)}")
 
-a = [1, 2, 3, 4]
-# a.insert(len(a), 5)
-print(type(None))
+# a = [1, 2, 3, 4]
+# # a.insert(len(a), 5)
+# print(type(None))
+
+
+
+print(1024 % (25))

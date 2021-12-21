@@ -25,7 +25,7 @@ from PyQt5.QtWidgets import (
 
 # DB_PARAMS_PATH = "db_connection.json"
 POSTGRES_LOGIN = "postgres"
-POSTGRES_PASS = "16912"
+POSTGRES_PASS = "246509"
 
 
 def odin_protection(query: str):
@@ -326,7 +326,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
         while True:
             dialog.exec()
             login_data = dialog.getInputs()
-            # login_data = ['supercoder008', 'Qj4Yv ']
+            login_data = ['supercoder008', 'Qj4Yv ']
             # login_data = ['bebroid', '123']
             try:
                 self.conn = pg.connect(host="localhost",
@@ -482,6 +482,7 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
 
         # PIZDEC, SLISHKOM MNOGO ODINAKOVOGO KODA
         if curr_obj == "branch storage":
+            self.current_commit = curr_obj
             self.codeText.clear()
             self.cur.execute(odin_protection(f"select model from rep_storage where id = '{self.branches_name_id[self.current_branch]}'"))
             for record in self.cur.fetchall():
@@ -784,6 +785,15 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                 self.change_commit_view(list(self.branches_name_id.keys())[0])
 
     def delete_commit(self):
+        try:
+            assert not isinstance(self.current_commit, type(None)) and not self.current_commit == "branch storage"
+        except:
+            QMessageBox.critical(  
+                        LoginDialog(),
+                        "DELETE ERROR",
+                        "You cant delete branch storage!")
+            return
+
         del_dialog = DelDialog(f"commit:\n{self.current_commit}")
         del_dialog.exec()
 
@@ -798,9 +808,10 @@ class GithubApp(QMainWindow, github_ui8.Ui_MainWindow):
                 QMessageBox.critical(  
                         LoginDialog(),
                         "DELETE ERROR",
-                        "Нou can't delete this commit because you are not the author of this repository or the author of this commit!")
+                        "You can't delete this commit because you are not the author of this repository or the author of this commit!")
                 return
             try:
+
                 self.cur.execute("begin")
                 self.cur.execute(odin_protection(f"delete from commits where uuid = '{self.current_commit}'"))
                 self.conn.commit()
